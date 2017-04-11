@@ -64,4 +64,13 @@ public class Person implements Comparable<Person> {
 		int comparisionResult = this.lastName.compareTo(o.getLastName());
 		return comparisionResult != 0 ? comparisionResult : this.firstName.compareTo(o.getFirstName());
 	}
+
+	public static int comparePhoneNumber(Person o) {
+    return this.telephoneNumber.compareTo(o.getTelephoneNumber());
+  }
+
+	public static int compareEmail(Person o) {
+    return this.email.compareTo(o.getEmail());
+  }
+
 }
