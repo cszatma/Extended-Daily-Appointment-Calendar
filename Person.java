@@ -1,12 +1,12 @@
 
 public class Person implements Comparable<Person> {
-	
+
 	private String firstName;
 	private String lastName;
 	private String telephoneNumber;
 	private String address;
 	private String email;
-	
+
 	public Person(String firstName, String lastName, String telephoneNumber, String address, String email) {
 		this.setFirstName(firstName);
 		this.setLastName(lastName);
@@ -54,14 +54,14 @@ public class Person implements Comparable<Person> {
 	public void setEmail(String email) {
 		this.email = email;
 	}
-	
+
 	public String toString() {
 		return String.format("%s %s %s %s %s", firstName, lastName, telephoneNumber, address, email);
 	}
 
 	@Override
 	public int compareTo(Person o) {
-		// TODO Auto-generated method stub
-		return 0;
+		int comparisionResult = this.lastName.compareTo(o.getLastName());
+		return comparisionResult != 0 ? comparisionResult : this.firstName.compareTo(o.getFirstName());
 	}
 }
