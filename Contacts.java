@@ -1,11 +1,9 @@
 import java.util.LinkedList;
-<<<<<<< HEAD
-=======
 import java.util.Scanner;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.lang.NumberFormatException;
->>>>>>> additions
+
 
 public class Contacts {
   private LinkedList<Person> people;
@@ -14,13 +12,10 @@ public class Contacts {
     return this.people;
   }
 
-<<<<<<< HEAD
-=======
   public void setPeople(LinkedList<Person> people) {
     this.people = people;
   }
 
->>>>>>> additions
   public Person findPerson(String lastName, String firstName) {
     for (Person p : this.people) {
       if (p.compareTo(new Person(firstName, lastName, "", "", "")) == 0) {
@@ -50,8 +45,6 @@ public class Contacts {
     return null;
   }
 
-<<<<<<< HEAD
-=======
   public void readContactsFile() throws FileNotFoundException, NumberFormatException  {
     Scanner in = new Scanner(new File("contacts.txt"));
     int numOfContacts = in.nextInt();
@@ -62,5 +55,4 @@ public class Contacts {
 
   }
 
->>>>>>> additions
 }
