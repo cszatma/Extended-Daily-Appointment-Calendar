@@ -56,7 +56,7 @@ public class Person implements Comparable<Person> {
 	}
 
 	public String toString() {
-		return String.format("%s %s %s %s %s", firstName, lastName, telephoneNumber, address, email);
+		return String.format("%s %s %s %s", firstName, lastName, telephoneNumber, email);
 	}
 
 	@Override

@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.GregorianCalendar;
+import java.io.FileNotFoundException;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -17,6 +18,10 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
 public class AppointmentFrame extends JFrame {
+
+	enum ContactPanelAction {
+		FIND, CLEAR
+	}
 
 	private static final int FRAME_WIDTH = 300;
 	private static final int FRAME_HEIGHT = 800;
@@ -62,9 +67,9 @@ public class AppointmentFrame extends JFrame {
 	public AppointmentFrame() {
 		currentDate = new GregorianCalendar();
 		dateFormat = new SimpleDateFormat("EEE, MMM d, yyyy");
-		//appointments = generateRandomAppointments();
 		appointments = new ArrayList<Appointment>();
 		contacts = new Contacts();
+		setupContacts();
 
 		this.setLayout(new BorderLayout());
 
@@ -220,8 +225,66 @@ public class AppointmentFrame extends JFrame {
 	}
 
 	private JPanel setUpContactPanel(){
-		JPanel mainPanel = new JPanel(new GridLayout(7, 1));
+		JPanel mainPanel = new JPanel(new GridLayout(3, 1));
+		JPanel topSubPanel = new JPanel(new GridLayout(1, 2));
+		JPanel innerSubPanel = new JPanel(new GridLayout(4, 1));
 
+		//Setup left side
+		JLabel lastNameLabel = new JLabel("Last Name");
+		lastNameField = new JTextField();
+		JLabel telLabel = new JLabel("Telephone Number");
+		telephoneNumberField = new JTextField();
+		innerSubPanel.add(lastNameLabel);
+		innerSubPanel.add(lastNameField);
+		innerSubPanel.add(telLabel);
+		innerSubPanel.add(telephoneNumberField);
+		topSubPanel.add(innerSubPanel);
+
+		//Setup left side
+		innerSubPanel = new JPanel(new GridLayout(4, 1));
+		JLabel firstNameLabel = new JLabel("First Name");
+		firstNameField = new JTextField();
+		JLabel emailLabel = new JLabel("Email");
+		emailField = new JTextField();
+		innerSubPanel.add(firstNameLabel);
+		innerSubPanel.add(firstNameField);
+		innerSubPanel.add(emailLabel);
+		innerSubPanel.add(emailField);
+		topSubPanel.add(innerSubPanel);
+
+		//Setup address Area
+		JPanel middleSubPanel = new JPanel(new GridLayout(2, 1));
+		JLabel addressLabel = new JLabel("Address");
+		addressField = new JTextField();
+		middleSubPanel.add(addressLabel);
+		middleSubPanel.add(addressField);
+
+		//Setup buttons
+		JPanel bottomSubPanel = new JPanel(new GridLayout(1, 2));
+		findButton = new JButton("Find");
+		findButton.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				contactHandler(ContactPanelAction.FIND);
+			}
+		});
+		clearButton = new JButton("Clear");
+		clearButton.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				contactHandler(ContactPanelAction.CLEAR);
+			}
+		});
+		bottomSubPanel.add(findButton);
+		bottomSubPanel.add(clearButton);
+
+		//Add all subpanels
+		mainPanel.add(topSubPanel);
+		mainPanel.add(middleSubPanel);
+		mainPanel.add(bottomSubPanel);
+		return mainPanel;
 	}
 
 	//Prints all the appointments in the arraylist to the main textarea
@@ -252,7 +315,7 @@ public class AppointmentFrame extends JFrame {
 			int minute = (minuteField.getText().equals("")) ? 0 : Integer.parseInt(minuteField.getText());
 			GregorianCalendar date = new GregorianCalendar(currentDate.get(Calendar.YEAR), currentDate.get(Calendar.MONTH), currentDate.get(Calendar.DAY_OF_MONTH),
 					Integer.parseInt(hourField.getText()), minute);
-			a = new Appointment(date, descriptionArea.getText()); // FIXME Update so person object is added
+			a = new Appointment(date, descriptionArea.getText(), selectedPerson);
 			appointments.add(a);
 		} else {
 			descriptionArea.setText("CONFLICT");
@@ -271,7 +334,7 @@ public class AppointmentFrame extends JFrame {
 	}
 
 	private void recallAppointment() {
-		
+		//TODO Add ability to recall appointments
 	}
 
 	//Helper method to return appointment at time user entered
@@ -281,22 +344,18 @@ public class AppointmentFrame extends JFrame {
 				Integer.parseInt(hourField.getText()), minute);
 	}
 
-	//Helper method to generate random appointments at the start of the program for demonstrational purposes
-	// private static ArrayList<Appointment> generateRandomAppointments() {
-	// 	 ArrayList<Appointment> appts = new ArrayList<Appointment>();
-	// 	 GregorianCalendar date = new GregorianCalendar();
-	// 	 appts.add(new Appointment(date, "Mark Assignment"));
-	// 	 date.set(Calendar.HOUR_OF_DAY, date.get(Calendar.HOUR_OF_DAY) + 2);
-	// 	 appts.add(new Appointment(date, "Lecture"));
-	// 	 date.set(Calendar.HOUR_OF_DAY, date.get(Calendar.HOUR_OF_DAY) - 3);
-	// 	 appts.add(new Appointment(date, "Quiz"));
-	// 	 date.set(Calendar.DAY_OF_MONTH, date.get(Calendar.DAY_OF_MONTH) + 1);
-	// 	 date.set(Calendar.HOUR_OF_DAY, date.get(Calendar.HOUR_OF_DAY) + 5);
-	// 	 appts.add(new Appointment(date, "Exam"));
-	// 	 date.set(Calendar.DAY_OF_MONTH, date.get(Calendar.DAY_OF_MONTH) - 2);
-	// 	 date.set(Calendar.HOUR_OF_DAY, date.get(Calendar.HOUR_OF_DAY) - 6);
-	// 	 appts.add(new Appointment(date, "Submit Assignment"));
-	// 	 return appts;
-	// }
+	private void contactHandler(ContactPanelAction action) {
+		//TODO handle find and clear button clicks
+	}
+
+	private void setupContacts() {
+		try {
+			contacts.readContactsFile();
+		} catch (FileNotFoundException e) {
+			descriptionArea.setText("Unable to find contacts.txt file.");
+		} catch (Exception e) {
+			descriptionArea.setText("Unable to read file.");
+		}
+	}
 
 }
