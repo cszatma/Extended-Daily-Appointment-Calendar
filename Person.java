@@ -7,12 +7,12 @@ public class Person implements Comparable<Person> {
 	private String address;
 	private String email;
 
-	public Person(String firstName, String lastName, String telephoneNumber, String address, String email) {
-		this.setFirstName(firstName);
-		this.setLastName(lastName);
-		this.setTelephoneNumber(telephoneNumber);
-		this.setAddress(address);
-		this.setEmail(email);
+	public Person(String lastName, String firstName, String address, String telephoneNumber, String email) {
+		this.lastName = lastName;
+		this.firstName = firstName;
+		this.address = address;
+		this.telephoneNumber = telephoneNumber;
+		this.email = email;
 	}
 
 	public String getFirstName() {

@@ -50,7 +50,7 @@ public class Appointment implements Comparable<Appointment> {
 
 	//Creates a string representation of the appointment
 	public String print() {
-		return DATE_FORMAT.format(date.getTime()) + " " + description + (person != null ? person : "");
+		return DATE_FORMAT.format(date.getTime()) + " " + description + " WITH: " + (person != null ? person : "");
 	}
 
 	public boolean occursOnDate(int year, int month, int day) {

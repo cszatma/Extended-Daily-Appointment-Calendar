@@ -16,6 +16,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.JOptionPane;
 
 public class AppointmentFrame extends JFrame {
 
@@ -23,7 +24,7 @@ public class AppointmentFrame extends JFrame {
 		FIND, CLEAR
 	}
 
-	private static final int FRAME_WIDTH = 300;
+	private static final int FRAME_WIDTH = 800;
 	private static final int FRAME_HEIGHT = 800;
 	public static final int HGAP = 5;
 	public static final int VGAP = 5;
@@ -71,22 +72,34 @@ public class AppointmentFrame extends JFrame {
 		contacts = new Contacts();
 		setupContacts();
 
-		this.setLayout(new BorderLayout());
+		this.setLayout(new GridLayout(1, 2));
+		//this.setLayout(new BorderLayout());
+		JPanel leftPanel = new JPanel(new GridLayout(2, 1));
+		JPanel rightPanel = new JPanel(new GridLayout(1, 1));
 
 		currentDateLabel = new JLabel(dateFormat.format(currentDate.getTime()));
-		this.add(currentDateLabel, BorderLayout.NORTH);
+		//this.add(currentDateLabel, BorderLayout.NORTH);
 
 		appointmentsTextArea = new JTextArea();
 		appointmentsTextArea.setEditable(false);
-		this.add(appointmentsTextArea, BorderLayout.CENTER);
+		//this.add(appointmentsTextArea, BorderLayout.CENTER);
+		JPanel mainViewPanel = new JPanel(new GridLayout(2, 1));
+		mainViewPanel.add(currentDateLabel);
+		mainViewPanel.add(appointmentsTextArea);
+		leftPanel.add(mainViewPanel);
 
 		JPanel leftControlPanel = new JPanel(new GridLayout(2, 1));
 		setUpLeftControlPanel(leftControlPanel);
-		this.add(leftControlPanel, BorderLayout.SOUTH);
+		//this.add(leftControlPanel, BorderLayout.SOUTH);
+		leftPanel.add(leftControlPanel);
 
 		JPanel rightControlPanel = new JPanel(new GridLayout(2, 1));
 		setUpRightControlPanel(rightControlPanel);
-		this.add(rightControlPanel, BorderLayout.WEST);
+		//this.add(rightControlPanel, BorderLayout.EAST);
+		rightPanel.add(rightControlPanel);
+
+		this.add(leftPanel);
+		this.add(rightPanel);
 
 		printAppointments();
 		setSize(FRAME_WIDTH, FRAME_HEIGHT);
@@ -344,17 +357,36 @@ public class AppointmentFrame extends JFrame {
 				Integer.parseInt(hourField.getText()), minute);
 	}
 
+	//Handles Find and Clear button actions
 	private void contactHandler(ContactPanelAction action) {
-		//TODO handle find and clear button clicks
+		Person p = null;
+		if (!lastNameField.getText().equals("") && !firstNameField.getText().equals("")) {
+			p = contacts.findPerson(lastNameField.getText(), firstNameField.getText());
+		} else if (!telephoneNumberField.getText().equals("")) {
+			p = contacts.findPersonWithNumber(telephoneNumberField.getText());
+		} else if (!emailField.getText().equals("")) {
+			p = contacts.findPersonWithEmail(emailField.getText());
+		}
+		if (p == null && action == ContactPanelAction.FIND) {
+			return;
+		}
+
+		lastNameField.setText(action == ContactPanelAction.FIND ? p.getLastName() : "");
+		firstNameField.setText(action == ContactPanelAction.FIND ? p.getFirstName() : "");
+		telephoneNumberField.setText(action == ContactPanelAction.FIND ? p.getTelephoneNumber() : "");
+		emailField.setText(action == ContactPanelAction.FIND ? p.getEmail() : "");
+		addressField.setText(action == ContactPanelAction.FIND ? p.getAddress() : "");
+		selectedPerson = action == ContactPanelAction.FIND ? p : null;
 	}
 
+	//Gets contacts from file
 	private void setupContacts() {
 		try {
 			contacts.readContactsFile();
 		} catch (FileNotFoundException e) {
-			descriptionArea.setText("Unable to find contacts.txt file.");
+			JOptionPane.showMessageDialog(null, "Unable to find contacts.txt file.", "Error", JOptionPane.INFORMATION_MESSAGE);
 		} catch (Exception e) {
-			descriptionArea.setText("Unable to read file.");
+			JOptionPane.showMessageDialog(null, "Unable to read contacts.", "Error", JOptionPane.INFORMATION_MESSAGE);
 		}
 	}
 
