@@ -26,6 +26,8 @@ public class AppointmentFrame extends JFrame {
 	private Calendar currentDate;
 	private SimpleDateFormat dateFormat;
 	private final ArrayList<Appointment> appointments;
+	private final Contacts contacts;
+	private Person selectedPerson = null; // Person the user has currently found
 
 	private JLabel currentDateLabel; //Label at the top which shows the current date
 	private JTextArea appointmentsTextArea; //Text Area that shows all the appointments for the current date
@@ -41,8 +43,20 @@ public class AppointmentFrame extends JFrame {
 	private JButton showButton;
 	private JButton createButton;
 	private JButton cancelButton;
+	private JButton recallButton;
 
 	private JTextArea descriptionArea;
+
+	/* Contact Panel Objects */
+	private JTextField lastNameField;
+	private JTextField firstNameField;
+	private JTextField telephoneNumberField;
+	private JTextField emailField;
+	private JTextField addressField;
+
+	private JButton findButton;
+	private JButton clearButton;
+	/* End Contact Objects */
 
 	//Constructor, set up main parts of frame
 	public AppointmentFrame() {
@@ -50,6 +64,7 @@ public class AppointmentFrame extends JFrame {
 		dateFormat = new SimpleDateFormat("EEE, MMM d, yyyy");
 		//appointments = generateRandomAppointments();
 		appointments = new ArrayList<Appointment>();
+		contacts = new Contacts();
 
 		this.setLayout(new BorderLayout());
 
@@ -60,21 +75,32 @@ public class AppointmentFrame extends JFrame {
 		appointmentsTextArea.setEditable(false);
 		this.add(appointmentsTextArea, BorderLayout.CENTER);
 
-		JPanel controlPanel = new JPanel(new GridLayout(3, 1));
-		setUpControlPanel(controlPanel);
-		this.add(controlPanel, BorderLayout.SOUTH);
+		JPanel leftControlPanel = new JPanel(new GridLayout(2, 1));
+		setUpLeftControlPanel(leftControlPanel);
+		this.add(leftControlPanel, BorderLayout.SOUTH);
+
+		JPanel rightControlPanel = new JPanel(new GridLayout(2, 1));
+		setUpRightControlPanel(rightControlPanel);
+		this.add(rightControlPanel, BorderLayout.WEST);
 
 		printAppointments();
 		setSize(FRAME_WIDTH, FRAME_HEIGHT);
 	}
 
-	private void setUpControlPanel(JPanel panel) {
+	private void setUpLeftControlPanel(JPanel panel) {
 		JPanel datePanel = setUpDatePanel();
 		datePanel.setBorder(BorderFactory.createTitledBorder("Date"));
 		panel.add(datePanel);
 		JPanel actionPanel = setUpActionPanel();
-		actionPanel.setBorder(BorderFactory.createTitledBorder("Action"));
+		actionPanel.setBorder(BorderFactory.createTitledBorder("Appointment"));
 		panel.add(actionPanel);
+	}
+
+	private void setUpRightControlPanel(JPanel panel) {
+		JPanel contactPanel = setUpContactPanel();
+		contactPanel.setBorder(BorderFactory.createTitledBorder("Contact"));
+		panel.add(contactPanel);
+
 		JPanel descriptionPanel = setUpDescriptionPanel();
 		descriptionPanel.setBorder(BorderFactory.createTitledBorder("Description"));
 		panel.add(descriptionPanel);
@@ -169,6 +195,14 @@ public class AppointmentFrame extends JFrame {
 				cancelAppointment();
 			}
 		});
+		recallButton = new JButton("RECALL");
+		recallButton.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				recallAppointment();
+			}
+		});
 		subPanel2.add(createButton);
 		subPanel2.add(cancelButton);
 		mainPanel.add(subPanel2);
@@ -183,6 +217,11 @@ public class AppointmentFrame extends JFrame {
 		mainPanel.add(descriptionArea, BorderLayout.CENTER);
 
 		return mainPanel;
+	}
+
+	private JPanel setUpContactPanel(){
+		JPanel mainPanel = new JPanel(new GridLayout(7, 1));
+
 	}
 
 	//Prints all the appointments in the arraylist to the main textarea
@@ -229,6 +268,10 @@ public class AppointmentFrame extends JFrame {
 			appointments.remove(a);
 		}
 		printAppointments();
+	}
+
+	private void recallAppointment() {
+		
 	}
 
 	//Helper method to return appointment at time user entered
