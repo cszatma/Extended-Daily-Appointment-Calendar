@@ -65,4 +65,8 @@ public class Person implements Comparable<Person> {
 		return comparisionResult != 0 ? comparisionResult : this.firstName.compareTo(o.getFirstName());
 	}
 
+	public boolean equals(Person p) {
+		return this.lastName.equals(p.getLastName()) && this.firstName.equals(p.getFirstName()) && this.address.equals(p.getAddress()) && this.telephoneNumber.equals(p.getTelephoneNumber()) && this.email.equals(p.getEmail());
+	}
+
 }

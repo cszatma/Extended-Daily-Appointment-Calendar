@@ -50,7 +50,7 @@ public class Appointment implements Comparable<Appointment> {
 
 	//Creates a string representation of the appointment
 	public String print() {
-		return DATE_FORMAT.format(date.getTime()) + " " + description + " WITH: " + (person != null ? person : "");
+		return DATE_FORMAT.format(date.getTime()) + " " + description + (person != null ? " WITH: " + person : "");
 	}
 
 	public boolean occursOnDate(int year, int month, int day) {
@@ -65,6 +65,10 @@ public class Appointment implements Comparable<Appointment> {
 	@Override
 	public int compareTo(Appointment a) {
 		return this.date.compareTo(a.getDate());
+	}
+
+	public boolean equals(Appointment a) {
+		return this.date.equals(a.getDate()) && this.description.equals(a.getDescription());
 	}
 
 }

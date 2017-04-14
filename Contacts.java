@@ -22,7 +22,6 @@ public class Contacts {
 
   public Person findPerson(String lastName, String firstName) {
     for (Person p : this.people) {
-      System.out.println(p);
       if (p.compareTo(new Person(lastName, firstName, "", "", "")) == 0) {
         return p;
       }

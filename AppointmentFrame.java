@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.GregorianCalendar;
+import java.util.Stack;
 import java.io.FileNotFoundException;
 
 import javax.swing.BorderFactory;
@@ -17,6 +18,7 @@ import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.JOptionPane;
+import javax.swing.JScrollPane;
 
 public class AppointmentFrame extends JFrame {
 
@@ -37,6 +39,7 @@ public class AppointmentFrame extends JFrame {
 
 	private JLabel currentDateLabel; //Label at the top which shows the current date
 	private JTextArea appointmentsTextArea; //Text Area that shows all the appointments for the current date
+	private Stack<Appointment> appointmentStack;
 
 	private JTextField dayField;
 	private JTextField monthField;
@@ -71,6 +74,7 @@ public class AppointmentFrame extends JFrame {
 		appointments = new ArrayList<Appointment>();
 		contacts = new Contacts();
 		setupContacts();
+		appointmentStack = new Stack<Appointment>();
 
 		this.setLayout(new GridLayout(1, 2));
 		//this.setLayout(new BorderLayout());
@@ -82,10 +86,11 @@ public class AppointmentFrame extends JFrame {
 
 		appointmentsTextArea = new JTextArea();
 		appointmentsTextArea.setEditable(false);
+		JScrollPane scrollArea = new JScrollPane(appointmentsTextArea);
 		//this.add(appointmentsTextArea, BorderLayout.CENTER);
 		JPanel mainViewPanel = new JPanel(new GridLayout(2, 1));
 		mainViewPanel.add(currentDateLabel);
-		mainViewPanel.add(appointmentsTextArea);
+		mainViewPanel.add(scrollArea);
 		leftPanel.add(mainViewPanel);
 
 		JPanel leftControlPanel = new JPanel(new GridLayout(2, 1));
@@ -196,7 +201,7 @@ public class AppointmentFrame extends JFrame {
 		subPanel1.add(minuteField);
 		mainPanel.add(subPanel1);
 
-		JPanel subPanel2 = new JPanel(new GridLayout(1, 2));
+		JPanel subPanel2 = new JPanel(new GridLayout(1, 3));
 		createButton = new JButton("CREATE");
 		createButton.addActionListener(new ActionListener() {
 
@@ -223,6 +228,7 @@ public class AppointmentFrame extends JFrame {
 		});
 		subPanel2.add(createButton);
 		subPanel2.add(cancelButton);
+		subPanel2.add(recallButton);
 		mainPanel.add(subPanel2);
 
 		return mainPanel;
@@ -330,6 +336,7 @@ public class AppointmentFrame extends JFrame {
 					Integer.parseInt(hourField.getText()), minute);
 			a = new Appointment(date, descriptionArea.getText(), selectedPerson);
 			appointments.add(a);
+			appointmentStack.push(a);
 		} else {
 			descriptionArea.setText("CONFLICT");
 		}
@@ -340,14 +347,38 @@ public class AppointmentFrame extends JFrame {
 	//Cancels an appointment at a time the user specified
 	private void cancelAppointment() {
 		Appointment a = getAppointment();
-		if (a != null) {
-			appointments.remove(a);
+		if (a == null) {
+			return;
 		}
+		appointments.remove(a);
+		if (appointmentStack.peek().equals(a)) {
+			appointmentStack.pop();
+		} else {
+			Stack<Appointment> tempStack = new Stack<Appointment>();
+			Appointment tempAppointment;
+			while (!((tempAppointment = appointmentStack.pop()).equals(a))) {
+				tempStack.push(tempAppointment);
+			}
+			while (!tempStack.isEmpty()) {
+				appointmentStack.push(tempStack.pop());
+			}
+		}
+
 		printAppointments();
 	}
 
 	private void recallAppointment() {
-		//TODO Add ability to recall appointments
+		if (appointmentStack.isEmpty()) {
+			return;
+		}
+
+		Appointment appt = appointmentStack.peek();
+		currentDate = appt.getDate();
+		printAppointments();
+		currentDateLabel.setText(dateFormat.format(currentDate.getTime()));
+		hourField.setText(Integer.toString(appt.getDate().get(Calendar.HOUR_OF_DAY)));
+		minuteField.setText(Integer.toString(appt.getDate().get(Calendar.MINUTE)));
+		descriptionArea.setText(appt.getDescription());
 	}
 
 	//Helper method to return appointment at time user entered
