@@ -77,17 +77,14 @@ public class AppointmentFrame extends JFrame {
 		appointmentStack = new Stack<Appointment>();
 
 		this.setLayout(new GridLayout(1, 2));
-		//this.setLayout(new BorderLayout());
 		JPanel leftPanel = new JPanel(new GridLayout(2, 1));
 		JPanel rightPanel = new JPanel(new GridLayout(1, 1));
 
 		currentDateLabel = new JLabel(dateFormat.format(currentDate.getTime()));
-		//this.add(currentDateLabel, BorderLayout.NORTH);
 
 		appointmentsTextArea = new JTextArea();
 		appointmentsTextArea.setEditable(false);
 		JScrollPane scrollArea = new JScrollPane(appointmentsTextArea);
-		//this.add(appointmentsTextArea, BorderLayout.CENTER);
 		JPanel mainViewPanel = new JPanel(new GridLayout(2, 1));
 		mainViewPanel.add(currentDateLabel);
 		mainViewPanel.add(scrollArea);
@@ -95,12 +92,10 @@ public class AppointmentFrame extends JFrame {
 
 		JPanel leftControlPanel = new JPanel(new GridLayout(2, 1));
 		setUpLeftControlPanel(leftControlPanel);
-		//this.add(leftControlPanel, BorderLayout.SOUTH);
 		leftPanel.add(leftControlPanel);
 
 		JPanel rightControlPanel = new JPanel(new GridLayout(2, 1));
 		setUpRightControlPanel(rightControlPanel);
-		//this.add(rightControlPanel, BorderLayout.EAST);
 		rightPanel.add(rightControlPanel);
 
 		this.add(leftPanel);
@@ -331,9 +326,16 @@ public class AppointmentFrame extends JFrame {
 	private void createAppointment() {
 		Appointment a = getAppointment();
 		if (a == null) {
-			int minute = (minuteField.getText().equals("")) ? 0 : Integer.parseInt(minuteField.getText());
+			if (minuteField.getText().equals("")) {
+				minuteField.setText("0");
+			}
+
+			if (!checkInput(hourField) || !checkInput(minuteField)) {
+				return;
+			}
+
 			GregorianCalendar date = new GregorianCalendar(currentDate.get(Calendar.YEAR), currentDate.get(Calendar.MONTH), currentDate.get(Calendar.DAY_OF_MONTH),
-					Integer.parseInt(hourField.getText()), minute);
+					Integer.parseInt(hourField.getText()), Integer.parseInt(minuteField.getText()));
 			a = new Appointment(date, descriptionArea.getText(), selectedPerson);
 			appointments.add(a);
 			appointmentStack.push(a);
@@ -419,6 +421,35 @@ public class AppointmentFrame extends JFrame {
 		} catch (Exception e) {
 			JOptionPane.showMessageDialog(null, "Unable to read contacts.", "Error", JOptionPane.INFORMATION_MESSAGE);
 		}
+	}
+
+	private boolean checkInput(JTextField field) {
+		if (!isNumeric(field.getText())) {
+			descriptionArea.setText("Please enter a valid positive number.");
+			return false;
+		}
+		int value = Integer.parseInt(field.getText());
+
+		if (field == dayField) {
+
+		} else if (field == monthField) {
+
+		} else if (field == hourField) {
+			if (value > 23) {
+				descriptionArea.setText("Please enter a valid hour.");
+				return false;
+			}
+		} else if (field == minuteField) {
+			if (value > 59) {
+				descriptionArea.setText("Please enter a valid minute.");
+				return false;
+			}
+		}
+		return true;
+	}
+
+	private boolean isNumeric(String s) {
+		return s.matches("^\\d+$");
 	}
 
 }
