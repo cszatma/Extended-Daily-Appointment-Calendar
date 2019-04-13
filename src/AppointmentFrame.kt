@@ -1,455 +1,420 @@
-import java.awt.BorderLayout;
-import java.awt.GridLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Collections;
-import java.util.GregorianCalendar;
-import java.util.Stack;
-import java.io.FileNotFoundException;
+import java.awt.BorderLayout
+import java.awt.GridLayout
+import java.text.SimpleDateFormat
+import java.util.ArrayList
+import java.util.Calendar
+import java.util.GregorianCalendar
+import java.util.Stack
+import java.io.FileNotFoundException
 
-import javax.swing.BorderFactory;
-import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JTextArea;
-import javax.swing.JTextField;
-import javax.swing.JOptionPane;
-import javax.swing.JScrollPane;
+import javax.swing.BorderFactory
+import javax.swing.JButton
+import javax.swing.JFrame
+import javax.swing.JLabel
+import javax.swing.JPanel
+import javax.swing.JTextArea
+import javax.swing.JTextField
+import javax.swing.JOptionPane
+import javax.swing.JScrollPane
 
-public class AppointmentFrame extends JFrame {
+class AppointmentFrame : JFrame() {
 
-	enum ContactPanelAction {
+	private enum class ContactPanelAction {
 		FIND, CLEAR
 	}
 
-	private static final int FRAME_WIDTH = 800;
-	private static final int FRAME_HEIGHT = 800;
-	public static final int HGAP = 5;
-	public static final int VGAP = 5;
+	private companion object {
+		const val FRAME_WIDTH = 800
+		const val FRAME_HEIGHT = 800
+		const val HGAP = 5
+		const val VGAP = 5
+	}
 
-	private Calendar currentDate;
-	private SimpleDateFormat dateFormat;
-	private final ArrayList<Appointment> appointments;
-	private final Contacts contacts;
-	private Person selectedPerson = null; // Person the user has currently found
+	private var currentDate: Calendar
+	private var dateFormat: SimpleDateFormat
+	private val appointments: ArrayList<Appointment>
+	private val contacts: Contacts
+	private var selectedPerson: Person? = null // Person the user has currently found
 
-	private JLabel currentDateLabel; //Label at the top which shows the current date
-	private JTextArea appointmentsTextArea; //Text Area that shows all the appointments for the current date
-	private Stack<Appointment> appointmentStack;
+	private var currentDateLabel: JLabel //Label at the top which shows the current date
+	private var appointmentsTextArea: JTextArea //Text Area that shows all the appointments for the current date
+	private var appointmentStack: Stack<Appointment>
 
-	private JTextField dayField;
-	private JTextField monthField;
-	private JTextField yearField;
-	private JTextField hourField;
-	private JTextField minuteField;
+	private lateinit var dayField: JTextField
+	private lateinit var monthField: JTextField
+	private lateinit var yearField: JTextField
+	private lateinit var hourField: JTextField
+	private lateinit var minuteField: JTextField
 
-	private JButton previousDayButton;
-	private JButton nextDayButton;
-	private JButton showButton;
-	private JButton createButton;
-	private JButton cancelButton;
-	private JButton recallButton;
+	private lateinit var previousDayButton: JButton
+	private lateinit var nextDayButton: JButton
+	private lateinit var showButton: JButton
+	private lateinit var createButton: JButton
+	private lateinit var cancelButton: JButton
+	private lateinit var recallButton: JButton
 
-	private JTextArea descriptionArea;
+	private lateinit var descriptionArea: JTextArea
 
 	/* Contact Panel Objects */
-	private JTextField lastNameField;
-	private JTextField firstNameField;
-	private JTextField telephoneNumberField;
-	private JTextField emailField;
-	private JTextField addressField;
+	private lateinit var lastNameField: JTextField
+	private lateinit var firstNameField: JTextField
+	private lateinit var telephoneNumberField: JTextField
+	private lateinit var emailField: JTextField
+	private lateinit var addressField: JTextField
 
-	private JButton findButton;
-	private JButton clearButton;
+	private lateinit var findButton: JButton
+	private lateinit var clearButton: JButton
 	/* End Contact Objects */
 
 	//Constructor, set up main parts of frame
-	public AppointmentFrame() {
-		currentDate = new GregorianCalendar();
-		dateFormat = new SimpleDateFormat("EEE, MMM d, yyyy");
-		appointments = new ArrayList<Appointment>();
-		contacts = new Contacts();
-		setupContacts();
-		appointmentStack = new Stack<Appointment>();
+	init {
+		currentDate = GregorianCalendar()
+		dateFormat = SimpleDateFormat("EEE, MMM d, yyyy")
+		appointments = ArrayList()
+		contacts = Contacts()
+		setupContacts()
+		appointmentStack = Stack()
 
-		this.setLayout(new GridLayout(1, 2));
-		JPanel leftPanel = new JPanel(new GridLayout(2, 1));
-		JPanel rightPanel = new JPanel(new GridLayout(1, 1));
+		this.setLayout(GridLayout(1, 2))
+		val leftPanel = JPanel(GridLayout(2, 1))
+		val rightPanel = JPanel(GridLayout(1, 1))
 
-		currentDateLabel = new JLabel(dateFormat.format(currentDate.getTime()));
+		currentDateLabel = JLabel(dateFormat.format(currentDate.time))
 
-		appointmentsTextArea = new JTextArea();
-		appointmentsTextArea.setEditable(false);
-		JScrollPane scrollArea = new JScrollPane(appointmentsTextArea);
-		JPanel mainViewPanel = new JPanel(new GridLayout(2, 1));
-		mainViewPanel.add(currentDateLabel);
-		mainViewPanel.add(scrollArea);
-		leftPanel.add(mainViewPanel);
+		appointmentsTextArea = JTextArea()
+		appointmentsTextArea.isEditable = false
+		val scrollArea = JScrollPane(appointmentsTextArea)
+		val mainViewPanel = JPanel(GridLayout(2, 1))
+		mainViewPanel.add(currentDateLabel)
+		mainViewPanel.add(scrollArea)
+		leftPanel.add(mainViewPanel)
 
-		JPanel leftControlPanel = new JPanel(new GridLayout(2, 1));
-		setUpLeftControlPanel(leftControlPanel);
-		leftPanel.add(leftControlPanel);
+		val leftControlPanel = JPanel(GridLayout(2, 1))
+		setUpLeftControlPanel(leftControlPanel)
+		leftPanel.add(leftControlPanel)
 
-		JPanel rightControlPanel = new JPanel(new GridLayout(2, 1));
-		setUpRightControlPanel(rightControlPanel);
-		rightPanel.add(rightControlPanel);
+		val rightControlPanel = JPanel(GridLayout(2, 1))
+		setUpRightControlPanel(rightControlPanel)
+		rightPanel.add(rightControlPanel)
 
-		this.add(leftPanel);
-		this.add(rightPanel);
+		this.add(leftPanel)
+		this.add(rightPanel)
 
-		printAppointments();
-		setSize(FRAME_WIDTH, FRAME_HEIGHT);
+		printAppointments()
+		setSize(FRAME_WIDTH, FRAME_HEIGHT)
 	}
 
-	private void setUpLeftControlPanel(JPanel panel) {
-		JPanel datePanel = setUpDatePanel();
-		datePanel.setBorder(BorderFactory.createTitledBorder("Date"));
-		panel.add(datePanel);
-		JPanel actionPanel = setUpActionPanel();
-		actionPanel.setBorder(BorderFactory.createTitledBorder("Appointment"));
-		panel.add(actionPanel);
+	private fun setUpLeftControlPanel(panel: JPanel) {
+		val datePanel = setUpDatePanel()
+		datePanel.setBorder(BorderFactory.createTitledBorder("Date"))
+		panel.add(datePanel)
+		val actionPanel = setUpActionPanel()
+		actionPanel.setBorder(BorderFactory.createTitledBorder("Appointment"))
+		panel.add(actionPanel)
 	}
 
-	private void setUpRightControlPanel(JPanel panel) {
-		JPanel contactPanel = setUpContactPanel();
-		contactPanel.setBorder(BorderFactory.createTitledBorder("Contact"));
-		panel.add(contactPanel);
+	private fun setUpRightControlPanel(panel: JPanel) {
+		val contactPanel = setUpContactPanel()
+		contactPanel.setBorder(BorderFactory.createTitledBorder("Contact"))
+		panel.add(contactPanel)
 
-		JPanel descriptionPanel = setUpDescriptionPanel();
-		descriptionPanel.setBorder(BorderFactory.createTitledBorder("Description"));
-		panel.add(descriptionPanel);
+		val descriptionPanel = setUpDescriptionPanel()
+		descriptionPanel.setBorder(BorderFactory.createTitledBorder("Description"))
+		panel.add(descriptionPanel)
 	}
 
-	private JPanel setUpDatePanel() {
-		JPanel mainPanel = new JPanel(new GridLayout(3, 1));
-		JPanel subPanel1 = new JPanel(new GridLayout(1, 3));
-		previousDayButton = new JButton("<");
-		previousDayButton.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				currentDate.set(Calendar.DAY_OF_MONTH, currentDate.get(Calendar.DAY_OF_MONTH) - 1);
-				currentDateLabel.setText(dateFormat.format(currentDate.getTime()));
-				printAppointments();
-			}
-		});
-		nextDayButton = new JButton(">");
-		nextDayButton.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				currentDate.set(Calendar.DAY_OF_MONTH, currentDate.get(Calendar.DAY_OF_MONTH) + 1);
-				currentDateLabel.setText(dateFormat.format(currentDate.getTime()));
-				printAppointments();
-			}
-		});
-		subPanel1.add(previousDayButton);
-		subPanel1.add(nextDayButton);
-		mainPanel.add(subPanel1);
+	private fun setUpDatePanel(): JPanel {
+		val mainPanel = JPanel(GridLayout(3, 1))
+		val subPanel1 = JPanel(GridLayout(1, 3))
+		previousDayButton = JButton("<")
+		previousDayButton.addActionListener {
+			currentDate.dayOfMonth = currentDate.dayOfMonth - 1
+			currentDateLabel.text = dateFormat.format(currentDate.time)
+			printAppointments()
+		}
 
-		JPanel subPanel2 = new JPanel(new GridLayout(1, 6));
-		JLabel dayLabel = new JLabel("Day");
-		JLabel monthLabel = new JLabel("Month");
-		JLabel yearLabel = new JLabel("Year");
-		dayField = new JTextField();
-		monthField = new JTextField();
-		yearField = new JTextField();
-		subPanel2.add(dayLabel);
-		subPanel2.add(dayField);
-		subPanel2.add(monthLabel);
-		subPanel2.add(monthField);
-		subPanel2.add(yearLabel);
-		subPanel2.add(yearField);
-		mainPanel.add(subPanel2);
+		nextDayButton = JButton(">")
+		nextDayButton.addActionListener {
+			currentDate.dayOfMonth = currentDate.dayOfMonth + 1
+			currentDateLabel.text = dateFormat.format(currentDate.time)
+			printAppointments()
+		}
 
-		JPanel subPanel3 = new JPanel(new GridLayout(1, 1));
-		showButton = new JButton("Show");
-		showButton.addActionListener(new ActionListener() {
+		subPanel1.add(previousDayButton)
+		subPanel1.add(nextDayButton)
+		mainPanel.add(subPanel1)
 
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				currentDate = new GregorianCalendar(Integer.parseInt(yearField.getText()), Integer.parseInt(monthField.getText()) - 1, Integer.parseInt(dayField.getText()));
-				currentDateLabel.setText(dateFormat.format(currentDate.getTime()));
-				printAppointments();
-			}
-		});
-		subPanel3.add(showButton);
-		mainPanel.add(subPanel3);
+		val subPanel2 = JPanel(GridLayout(1, 6))
+		val dayLabel = JLabel("Day")
+		val monthLabel = JLabel("Month")
+		val yearLabel = JLabel("Year")
+		dayField = JTextField()
+		monthField = JTextField()
+		yearField = JTextField()
+		subPanel2.add(dayLabel)
+		subPanel2.add(dayField)
+		subPanel2.add(monthLabel)
+		subPanel2.add(monthField)
+		subPanel2.add(yearLabel)
+		subPanel2.add(yearField)
+		mainPanel.add(subPanel2)
 
-		return mainPanel;
+		val subPanel3 = JPanel(GridLayout(1, 1))
+		showButton = JButton("Show")
+		showButton.addActionListener {
+			currentDate = GregorianCalendar(yearField.text.toInt(), monthField.text.toInt() - 1, dayField.text.toInt())
+			currentDateLabel.text = dateFormat.format(currentDate.time)
+			printAppointments()
+		}
+
+		subPanel3.add(showButton)
+		mainPanel.add(subPanel3)
+
+		return mainPanel
 	}
 
-	private JPanel setUpActionPanel() {
-		JPanel mainPanel = new JPanel(new GridLayout(2, 1));
+	private fun setUpActionPanel(): JPanel {
+		val mainPanel = JPanel(GridLayout(2, 1))
 
-		JPanel subPanel1 = new JPanel(new GridLayout(1, 4));
-		JLabel hourLabel = new JLabel("Hour");
-		JLabel minuteLabel = new JLabel("Minute");
-		hourField = new JTextField();
-		minuteField = new JTextField();
+		val subPanel1 = JPanel(GridLayout(1, 4))
+		val hourLabel = JLabel("Hour")
+		val minuteLabel = JLabel("Minute")
+		hourField = JTextField()
+		minuteField = JTextField()
 
-		subPanel1.add(hourLabel);
-		subPanel1.add(hourField);
-		subPanel1.add(minuteLabel);
-		subPanel1.add(minuteField);
-		mainPanel.add(subPanel1);
+		subPanel1.add(hourLabel)
+		subPanel1.add(hourField)
+		subPanel1.add(minuteLabel)
+		subPanel1.add(minuteField)
+		mainPanel.add(subPanel1)
 
-		JPanel subPanel2 = new JPanel(new GridLayout(1, 3));
-		createButton = new JButton("CREATE");
-		createButton.addActionListener(new ActionListener() {
+		val subPanel2 = JPanel(GridLayout(1, 3))
+		createButton = JButton("CREATE")
+		createButton.addActionListener {
+			createAppointment()
+		}
 
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				createAppointment();
-			}
-		});
-		cancelButton = new JButton("CANCEL");
-		cancelButton.addActionListener(new ActionListener() {
+		cancelButton = JButton("CANCEL")
+		cancelButton.addActionListener {
+			cancelAppointment()
+		}
 
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				cancelAppointment();
-			}
-		});
-		recallButton = new JButton("RECALL");
-		recallButton.addActionListener(new ActionListener() {
+		recallButton = JButton("RECALL")
+		recallButton.addActionListener {
+			recallAppointment()
+		}
 
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				recallAppointment();
-			}
-		});
-		subPanel2.add(createButton);
-		subPanel2.add(cancelButton);
-		subPanel2.add(recallButton);
-		mainPanel.add(subPanel2);
+		subPanel2.add(createButton)
+		subPanel2.add(cancelButton)
+		subPanel2.add(recallButton)
+		mainPanel.add(subPanel2)
 
-		return mainPanel;
+		return mainPanel
 	}
 
-	private JPanel setUpDescriptionPanel() {
-		JPanel mainPanel = new JPanel(new BorderLayout());
+	private fun setUpDescriptionPanel(): JPanel {
+		val mainPanel = JPanel(BorderLayout())
 
-		descriptionArea = new JTextArea();
-		mainPanel.add(descriptionArea, BorderLayout.CENTER);
+		descriptionArea = JTextArea()
+		mainPanel.add(descriptionArea, BorderLayout.CENTER)
 
-		return mainPanel;
+		return mainPanel
 	}
 
-	private JPanel setUpContactPanel(){
-		JPanel mainPanel = new JPanel(new GridLayout(3, 1));
-		JPanel topSubPanel = new JPanel(new GridLayout(1, 2));
-		JPanel innerSubPanel = new JPanel(new GridLayout(4, 1));
+	private fun setUpContactPanel(): JPanel {
+		val mainPanel = JPanel(GridLayout(3, 1))
+		val topSubPanel = JPanel(GridLayout(1, 2))
+		var innerSubPanel = JPanel(GridLayout(4, 1))
 
 		//Setup left side
-		JLabel lastNameLabel = new JLabel("Last Name");
-		lastNameField = new JTextField();
-		JLabel telLabel = new JLabel("Telephone Number");
-		telephoneNumberField = new JTextField();
-		innerSubPanel.add(lastNameLabel);
-		innerSubPanel.add(lastNameField);
-		innerSubPanel.add(telLabel);
-		innerSubPanel.add(telephoneNumberField);
-		topSubPanel.add(innerSubPanel);
+		val lastNameLabel = JLabel("Last Name")
+		lastNameField = JTextField()
+		val telLabel = JLabel("Telephone Number")
+		telephoneNumberField = JTextField()
+		innerSubPanel.add(lastNameLabel)
+		innerSubPanel.add(lastNameField)
+		innerSubPanel.add(telLabel)
+		innerSubPanel.add(telephoneNumberField)
+		topSubPanel.add(innerSubPanel)
 
 		//Setup left side
-		innerSubPanel = new JPanel(new GridLayout(4, 1));
-		JLabel firstNameLabel = new JLabel("First Name");
-		firstNameField = new JTextField();
-		JLabel emailLabel = new JLabel("Email");
-		emailField = new JTextField();
-		innerSubPanel.add(firstNameLabel);
-		innerSubPanel.add(firstNameField);
-		innerSubPanel.add(emailLabel);
-		innerSubPanel.add(emailField);
-		topSubPanel.add(innerSubPanel);
+		innerSubPanel = JPanel(GridLayout(4, 1))
+		val firstNameLabel = JLabel("First Name")
+		firstNameField = JTextField()
+		val emailLabel = JLabel("Email")
+		emailField = JTextField()
+		innerSubPanel.add(firstNameLabel)
+		innerSubPanel.add(firstNameField)
+		innerSubPanel.add(emailLabel)
+		innerSubPanel.add(emailField)
+		topSubPanel.add(innerSubPanel)
 
 		//Setup address Area
-		JPanel middleSubPanel = new JPanel(new GridLayout(2, 1));
-		JLabel addressLabel = new JLabel("Address");
-		addressField = new JTextField();
-		middleSubPanel.add(addressLabel);
-		middleSubPanel.add(addressField);
+		val middleSubPanel = JPanel(GridLayout(2, 1))
+		val addressLabel = JLabel("Address")
+		addressField = JTextField()
+		middleSubPanel.add(addressLabel)
+		middleSubPanel.add(addressField)
 
 		//Setup buttons
-		JPanel bottomSubPanel = new JPanel(new GridLayout(1, 2));
-		findButton = new JButton("Find");
-		findButton.addActionListener(new ActionListener() {
+		val bottomSubPanel = JPanel(GridLayout(1, 2))
+		findButton = JButton("Find")
+		findButton.addActionListener {
+			contactHandler(ContactPanelAction.FIND)
+		}
 
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				contactHandler(ContactPanelAction.FIND);
-			}
-		});
-		clearButton = new JButton("Clear");
-		clearButton.addActionListener(new ActionListener() {
+		clearButton = JButton("Clear")
+		clearButton.addActionListener {
+			contactHandler(ContactPanelAction.CLEAR)
+		}
 
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				contactHandler(ContactPanelAction.CLEAR);
-			}
-		});
-		bottomSubPanel.add(findButton);
-		bottomSubPanel.add(clearButton);
+		bottomSubPanel.add(findButton)
+		bottomSubPanel.add(clearButton)
 
 		//Add all subpanels
-		mainPanel.add(topSubPanel);
-		mainPanel.add(middleSubPanel);
-		mainPanel.add(bottomSubPanel);
-		return mainPanel;
+		mainPanel.add(topSubPanel)
+		mainPanel.add(middleSubPanel)
+		mainPanel.add(bottomSubPanel)
+		return mainPanel
 	}
 
 	//Prints all the appointments in the arraylist to the main textarea
-	private void printAppointments() {
-		appointmentsTextArea.setText("");
-		Collections.sort(appointments);
-		for (Appointment a : appointments) {
-			if (a.occursOnDate(currentDate.get(Calendar.YEAR), currentDate.get(Calendar.MONTH), currentDate.get(Calendar.DAY_OF_MONTH))) {
-				appointmentsTextArea.append(a.print() + "\n\n");
-			}
-		}
-	}
+	private fun printAppointments() {
+		appointmentsTextArea.text = ""
+		appointments.sort()
 
-	//Returns an appointment if one exists at the specified time
-	private Appointment findAppointment(int year, int month, int day, int hour, int minute) {
-		for (Appointment a : appointments) {
-			if (a.occursOn(year, month, day, hour, minute)) {
-				return a;
+		for (a in appointments) {
+			if (a.occursOnDay(currentDate)) {
+				appointmentsTextArea.append("${a.print()}\n\n")
 			}
 		}
-		return null;
 	}
 
 	//Creates a new appointments based on what the user entered
-	private void createAppointment() {
-		Appointment a = getAppointment();
-		if (a == null) {
-			if (minuteField.getText().equals("")) {
-				minuteField.setText("0");
-			}
-
-			if (!checkInput(hourField) || !checkInput(minuteField)) {
-				return;
-			}
-
-			GregorianCalendar date = new GregorianCalendar(currentDate.get(Calendar.YEAR), currentDate.get(Calendar.MONTH), currentDate.get(Calendar.DAY_OF_MONTH),
-					Integer.parseInt(hourField.getText()), Integer.parseInt(minuteField.getText()));
-			a = new Appointment(date, descriptionArea.getText(), selectedPerson);
-			appointments.add(a);
-			appointmentStack.push(a);
-		} else {
-			descriptionArea.setText("CONFLICT");
+	private fun createAppointment() {
+		if (getAppointment() != null) {
+			descriptionArea.setText("CONFLICT")
+			return
 		}
 
-		printAppointments();
+		if (minuteField.text == "") {
+			minuteField.text = "0"
+		}
+
+		if (!checkInput(hourField) || !checkInput(minuteField)) {
+			return
+		}
+
+		val date = GregorianCalendar(currentDate.year, currentDate.month, currentDate.dayOfMonth,
+				hourField.text.toInt(), minuteField.text.toInt())
+		val appointment = Appointment(date, descriptionArea.text, selectedPerson)
+		appointments.add(appointment)
+		appointmentStack.push(appointment)
+
+		printAppointments()
 	}
 
 	//Cancels an appointment at a time the user specified
-	private void cancelAppointment() {
-		Appointment a = getAppointment();
+	private fun cancelAppointment() {
+		val a = getAppointment()
 		if (a == null) {
-			return;
+			return
 		}
-		appointments.remove(a);
-		if (appointmentStack.peek().equals(a)) {
-			appointmentStack.pop();
+
+		appointments.remove(a)
+		if (appointmentStack.peek() == a) {
+			appointmentStack.pop()
 		} else {
-			Stack<Appointment> tempStack = new Stack<Appointment>();
-			Appointment tempAppointment;
-			while (!((tempAppointment = appointmentStack.pop()).equals(a))) {
-				tempStack.push(tempAppointment);
+			val tempStack = Stack<Appointment>()
+			var tempAppointment = appointmentStack.pop()
+
+			while (tempAppointment != a) {
+				tempStack.push(tempAppointment)
+				tempAppointment = appointmentStack.pop()
 			}
+
 			while (!tempStack.isEmpty()) {
-				appointmentStack.push(tempStack.pop());
+				appointmentStack.push(tempStack.pop())
 			}
 		}
 
-		printAppointments();
+		printAppointments()
 	}
 
-	private void recallAppointment() {
+	private fun recallAppointment() {
 		if (appointmentStack.isEmpty()) {
-			return;
+			return
 		}
 
-		Appointment appt = appointmentStack.peek();
-		currentDate = appt.getDate();
-		printAppointments();
-		currentDateLabel.setText(dateFormat.format(currentDate.getTime()));
-		hourField.setText(Integer.toString(appt.getDate().get(Calendar.HOUR_OF_DAY)));
-		minuteField.setText(Integer.toString(appt.getDate().get(Calendar.MINUTE)));
-		descriptionArea.setText(appt.getDescription());
+		val appt = appointmentStack.peek()
+		currentDate = appt.date
+		printAppointments()
+		currentDateLabel.text = dateFormat.format(currentDate.time)
+		hourField.text = appt.date.hourOfDay.toString()
+		minuteField.text = appt.date.minute.toString()
+		descriptionArea.text = appt.description
 	}
 
 	//Helper method to return appointment at time user entered
-	private Appointment getAppointment() {
-		int minute = (minuteField.getText().equals("")) ? 0 : Integer.parseInt(minuteField.getText());
-		return findAppointment(currentDate.get(Calendar.YEAR), currentDate.get(Calendar.MONTH), currentDate.get(Calendar.DAY_OF_MONTH),
-				Integer.parseInt(hourField.getText()), minute);
+	private fun getAppointment(): Appointment? {
+		val minute = if (minuteField.text == "") 0 else minuteField.text.toInt()
+		return appointments.find {
+			it.occursOnDayAtTime(currentDate, hourField.text.toInt(), minute)
+		}
 	}
 
 	//Handles Find and Clear button actions
-	private void contactHandler(ContactPanelAction action) {
-		Person p = null;
-		if (!lastNameField.getText().equals("") && !firstNameField.getText().equals("")) {
-			p = contacts.findPerson(lastNameField.getText(), firstNameField.getText());
-		} else if (!telephoneNumberField.getText().equals("")) {
-			p = contacts.findPersonWithNumber(telephoneNumberField.getText());
-		} else if (!emailField.getText().equals("")) {
-			p = contacts.findPersonWithEmail(emailField.getText());
+	private fun contactHandler(action: ContactPanelAction) {
+		var p: Person? = null
+
+		if (lastNameField.text != "" && firstNameField.text != "") {
+			p = contacts.findPerson(lastNameField.text, firstNameField.text)
+		} else if (telephoneNumberField.text != "") {
+			p = contacts.findPersonWithNumber(telephoneNumberField.text)
+		} else if (emailField.text != "") {
+			p = contacts.findPersonWithEmail(emailField.text)
 		}
 		if (p == null && action == ContactPanelAction.FIND) {
-			return;
+			return
 		}
 
-		lastNameField.setText(action == ContactPanelAction.FIND ? p.getLastName() : "");
-		firstNameField.setText(action == ContactPanelAction.FIND ? p.getFirstName() : "");
-		telephoneNumberField.setText(action == ContactPanelAction.FIND ? p.getTelephoneNumber() : "");
-		emailField.setText(action == ContactPanelAction.FIND ? p.getEmail() : "");
-		addressField.setText(action == ContactPanelAction.FIND ? p.getAddress() : "");
-		selectedPerson = action == ContactPanelAction.FIND ? p : null;
+		val isFind = action == ContactPanelAction.FIND
+
+		lastNameField.text = if (isFind) p?.lastName else ""
+		firstNameField.text = if (isFind) p?.firstName else ""
+		telephoneNumberField.text = if (isFind) p?.telephoneNumber else ""
+		emailField.text = if (isFind) p?.email else ""
+		addressField.text = if (isFind) p?.address else ""
+		selectedPerson = if (isFind) p else null
 	}
 
 	//Gets contacts from file
-	private void setupContacts() {
+	private fun setupContacts() {
 		try {
-			contacts.readContactsFile();
-		} catch (FileNotFoundException e) {
-			JOptionPane.showMessageDialog(null, "Unable to find contacts.txt file.", "Error", JOptionPane.INFORMATION_MESSAGE);
-		} catch (Exception e) {
-			JOptionPane.showMessageDialog(null, "Unable to read contacts.", "Error", JOptionPane.INFORMATION_MESSAGE);
+			contacts.readContactsFile()
+		} catch (e: FileNotFoundException) {
+			JOptionPane.showMessageDialog(null, "Unable to find contacts.txt file.", "Error", JOptionPane.INFORMATION_MESSAGE)
+		} catch (e: Exception) {
+			JOptionPane.showMessageDialog(null, "Unable to read contacts.", "Error", JOptionPane.INFORMATION_MESSAGE)
 		}
 	}
 
-	private boolean checkInput(JTextField field) {
-		if (!isNumeric(field.getText())) {
-			descriptionArea.setText("Please enter a valid positive number.");
-			return false;
+	private fun checkInput(field: JTextField): Boolean {
+		if (!field.text.isNumeric()) {
+			descriptionArea.text = "Please enter a valid positive number."
+			return false
 		}
-		int value = Integer.parseInt(field.getText());
 
-		if (field == dayField) {
+		val value = field.text.toInt()
 
-		} else if (field == monthField) {
-
-		} else if (field == hourField) {
-			if (value > 23) {
-				descriptionArea.setText("Please enter a valid hour.");
-				return false;
-			}
-		} else if (field == minuteField) {
-			if (value > 59) {
-				descriptionArea.setText("Please enter a valid minute.");
-				return false;
-			}
+		if (field == hourField && value > 23) {
+			descriptionArea.text = "Please enter a valid hour."
+			return false
+		} else if (field == minuteField && value > 59) {
+			descriptionArea.text = "Please enter a valid minute."
+			return false
 		}
-		return true;
-	}
 
-	private boolean isNumeric(String s) {
-		return s.matches("^\\d+$");
+		return true
 	}
-
 }

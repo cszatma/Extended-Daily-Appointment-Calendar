@@ -1,62 +1,33 @@
 import java.util.LinkedList;
 import java.util.Scanner;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.lang.NumberFormatException;
+
+class Contacts() {
+  var people = LinkedList<Person>()
+
+  fun findPerson(lastName: String, firstName: String) =
+          people.find { it.lastName == lastName && it.firstName == firstName }
 
 
-public class Contacts {
-  private LinkedList<Person> people;
+  fun findPersonWithNumber(telephoneNumber: String) =
+          people.find { it.telephoneNumber == telephoneNumber }
 
-  public Contacts() {
-    this.people = new LinkedList<Person>();
-  }
+  fun findPersonWithEmail(email: String) =
+          people.find { it.email == email }
 
-  public LinkedList<Person> getPeople() {
-    return this.people;
-  }
+  fun readContactsFile() {
+    val scanner = Scanner( File("contacts.txt"));
+    val numOfContacts = scanner.nextLine().toInt()
 
-  public void setPeople(LinkedList<Person> people) {
-    this.people = people;
-  }
-
-  public Person findPerson(String lastName, String firstName) {
-    for (Person p : this.people) {
-      if (p.compareTo(new Person(lastName, firstName, "", "", "")) == 0) {
-        return p;
-      }
+    for (i in 0 until numOfContacts) {
+      people.add(Person(
+              scanner.nextLine(),
+              scanner.nextLine(),
+              scanner.nextLine(),
+              scanner.nextLine(),
+              scanner.nextLine()
+      ))
     }
-    return null;
-  }
-
-  public Person findPersonWithNumber(String telephoneNumber) {
-    final PhoneNumberComparer comparer = new PhoneNumberComparer();
-    for (Person p : this.people) {
-      if (comparer.compare(p, new Person("", "", "", telephoneNumber, "")) == 0) {
-        return p;
-      }
-    }
-    return null;
-  }
-
-  public Person findPersonWithEmail(String email) {
-    final EmailComparer comparer = new EmailComparer();
-    for (Person p : this.people) {
-      if(comparer.compare(p, new Person("", "", "", "", email)) == 0) {
-      return p;
-      }
-    }
-    return null;
-  }
-
-  public void readContactsFile() throws FileNotFoundException, NumberFormatException  {
-    Scanner in = new Scanner(new File("contacts.txt"));
-    int numOfContacts = Integer.parseInt(in.nextLine());
-    for (int i = 0; i < numOfContacts; i++) {
-      Person currentPerson = new Person(in.nextLine(), in.nextLine(), in.nextLine(), in.nextLine(), in.nextLine());
-      this.people.add(currentPerson);
-    }
-
   }
 
 }
